@@ -1,0 +1,233 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+:root {
+  --primary: #002455;
+  --secondary: #08AAC7;
+  --accent: #00B359;
+  --warning: #FFAD0E;
+  --danger: #EC0928;
+  --background: #F7F6F8;
+  --border: #D9D9D9;
+  --text-secondary: #636466;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: var(--background);
+  color: var(--primary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.container-page {
+  @apply p-3 sm:p-4 lg:p-6;
+}
+
+.grid-2 {
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-5;
+}
+
+.grid-3 {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5;
+}
+
+.grid-4 {
+  @apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4;
+}
+
+.grid-6 {
+  @apply grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  @apply rounded-2xl p-4 shadow-sm;
+}
+
+.card-header {
+  @apply mb-3 flex items-center justify-between;
+}
+
+.btn {
+  @apply rounded-xl px-3.5 py-2 text-sm font-semibold transition;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover,
+.btn-accent:hover,
+.btn-warning:hover,
+.btn-danger:hover {
+  opacity: 0.92;
+}
+
+.btn-secondary {
+  background: var(--secondary);
+  color: white;
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-warning {
+  background: var(--warning);
+  color: white;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.input {
+  border: 1px solid var(--border);
+  @apply w-full rounded-xl px-3 py-2 text-sm focus:outline-none;
+}
+
+.input:focus {
+  box-shadow: 0 0 0 2px var(--secondary);
+}
+
+.table {
+  @apply w-full border-collapse text-sm;
+}
+
+.table th {
+  background: var(--background);
+  color: var(--text-secondary);
+  @apply p-2.5 text-left text-xs font-semibold uppercase tracking-wide;
+}
+
+.table td {
+  border-top: 1px solid var(--border);
+  @apply p-2.5;
+}
+
+.metric-card {
+  background: white;
+  border: 1px solid var(--border);
+  @apply flex flex-col gap-1 rounded-2xl p-4 shadow-sm;
+}
+
+.metric-value {
+  color: var(--primary);
+  @apply text-xl font-bold;
+}
+
+.metric-label {
+  color: var(--text-secondary);
+  @apply text-xs font-medium uppercase tracking-wide;
+}
+
+.progress-track {
+  background: var(--border);
+  @apply h-2.5 w-full overflow-hidden rounded-full;
+}
+
+.progress-fill {
+  background: var(--secondary);
+  @apply h-full rounded-full;
+}
+
+.insight-list {
+  color: var(--text-secondary);
+  @apply list-disc space-y-1.5 pl-5 text-sm;
+}
+
+.badge {
+  @apply rounded-full px-2.5 py-1 text-[11px] font-semibold;
+}
+
+.badge-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.badge-secondary {
+  background: var(--secondary);
+  color: white;
+}
+
+.badge-accent {
+  background: var(--accent);
+  color: white;
+}
+
+.badge-warning {
+  background: var(--warning);
+  color: white;
+}
+
+.badge-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.code-block {
+  background: var(--primary);
+  color: white;
+  @apply overflow-x-auto rounded-xl p-3 text-xs;
+}
+
+.chart-placeholder {
+  border: 2px dashed var(--border);
+  background: var(--background);
+  @apply flex h-64 flex-col items-center justify-center gap-3 rounded-2xl;
+}
+
+.sidebar {
+  background: var(--primary);
+  color: white;
+}
+
+.sidebar-link {
+  @apply block rounded-xl px-3 py-2.5 text-sm font-medium transition;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-link.active {
+  background: var(--secondary);
+  color: white;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--border);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-secondary);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .grid-2,
+  .grid-3,
+  .grid-4,
+  .grid-6 {
+    @apply grid-cols-1;
+  }
+}
