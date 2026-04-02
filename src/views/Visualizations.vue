@@ -1,4 +1,3 @@
-
 <template>
   <section class="space-y-5">
     <div class="grid grid-cols-1 gap-5 xl:grid-cols-[1.6fr_0.8fr]">
@@ -10,18 +9,28 @@
               Dataset: {{ activeDatasetData.name }}
             </p>
           </div>
-          <span class="badge badge-secondary">{{ recommendedGraph }}</span>
+          <span class="badge badge-secondary">{{ finalChartType }}</span>
         </div>
 
-        <div class="chart-placeholder">
+        <div v-if="canRenderChart" class="rounded-2xl border border-border bg-white p-4">
+          <DynamicChart
+            :chart-type="finalChartType"
+            :x-key="chartXKey"
+            :y-key="chartYKey"
+            :rows="activeDatasetData.previewRows || []"
+            :column-summary="activeDatasetData.columnSummary || []"
+          />
+        </div>
+
+        <div v-else class="chart-placeholder">
           <div
             class="flex h-24 w-64 items-center justify-center rounded-2xl border border-border bg-white px-4 text-center text-sm font-bold text-secondary"
           >
-            {{ chartTitle }}
+            Select a compatible chart setup
           </div>
 
           <p class="text-xs text-textSecondary">
-            {{ chartMessage }}
+            Upload data and choose suitable variables to render a chart.
           </p>
         </div>
       </div>
@@ -46,48 +55,18 @@
             </p>
           </div>
 
-          <div
-            class="rounded-2xl border p-3"
-            :class="isGoodMatch ? 'border-accent bg-background' : 'border-warning bg-background'"
-          >
-            <p class="text-xs text-textSecondary">Chart Match Status</p>
-            <p class="mt-1 text-sm font-semibold text-primary">
-              {{ matchStatus }}
-            </p>
-          </div>
-
           <div class="rounded-2xl border border-border bg-background p-3">
             <p class="text-xs text-textSecondary">X Variable</p>
             <p class="mt-1 text-sm font-semibold text-primary">
-              {{ state.selectedX || 'Not selected' }}
-            </p>
-            <p class="mt-1 text-xs text-textSecondary">
-              Type: {{ xMeta?.category || 'Unknown' }}
+              {{ chartXKey || 'Not selected' }}
             </p>
           </div>
 
           <div class="rounded-2xl border border-border bg-background p-3">
             <p class="text-xs text-textSecondary">Y Variable</p>
             <p class="mt-1 text-sm font-semibold text-primary">
-              {{ state.selectedY || 'Not selected' }}
+              {{ chartYKey || 'Not selected' }}
             </p>
-            <p class="mt-1 text-xs text-textSecondary">
-              Type: {{ yMeta?.category || 'Unknown' }}
-            </p>
-          </div>
-
-          <div class="rounded-2xl border border-border bg-background p-3">
-            <p class="text-xs text-textSecondary">Available Columns</p>
-            <div class="mt-2 flex flex-wrap gap-2">
-              <span
-                v-for="col in activeDatasetData.columnSummary || []"
-                :key="col.name"
-                class="badge"
-                :class="col.category === 'Quantitative' ? 'badge-secondary' : 'badge-primary'"
-              >
-                {{ col.name }}
-              </span>
-            </div>
           </div>
 
           <div class="rounded-2xl border border-border bg-background p-3">
@@ -105,6 +84,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useDashboardState } from '../composables/useDashboardState'
+import DynamicChart from '../components/DynamicChart.vue'
 
 const { state, activeDatasetData } = useDashboardState()
 
@@ -124,89 +104,38 @@ const recommendedGraph = computed(() => {
   const xType = xMeta.value?.category
   const yType = yMeta.value?.category
 
-  if (!xType && !yType) return 'No recommendation yet'
+  if (!xType) return 'Bar Chart'
   if (xType === 'Quantitative' && yType === 'Quantitative') return 'Scatter Plot'
-  if (xType === 'Qualitative' && yType === 'Quantitative') return 'Bar Chart'
-  if (xType === 'Quantitative' && !state.selectedY) return 'Histogram'
-  if (xType === 'Quantitative' && yType === 'Qualitative') return 'Bar Chart'
   if (xType === 'Qualitative' && yType === 'Qualitative') return 'Bar Chart'
-  return state.selectedGraphType || 'Chart'
+  if (xType === 'Qualitative' && yType === 'Quantitative') return 'Bar Chart'
+  if (xType === 'Quantitative' && yType === 'Qualitative') return 'Bar Chart'
+  return 'Bar Chart'
 })
 
-const isGoodMatch = computed(() => {
-  const selected = state.selectedGraphType
-  const xType = xMeta.value?.category
-  const yType = yMeta.value?.category
+const finalChartType = computed(() => {
+  return recommendedGraph.value
+})
 
-  if (!selected || !xType) return true
-
-  if (selected === 'Scatter Plot') {
-    return xType === 'Quantitative' && yType === 'Quantitative'
+const chartXKey = computed(() => state.selectedX || '')
+const chartYKey = computed(() => {
+  if (finalChartType.value === 'Scatter Plot') {
+    return state.selectedY || ''
   }
+  return state.selectedY || ''
+})
 
-  if (selected === 'Histogram' || selected === 'Box Plot') {
-    return xType === 'Quantitative'
-  }
-
-  if (selected === 'Line Chart') {
-    return xType === 'Quantitative' && yType === 'Quantitative'
-  }
-
-  if (selected === 'Bar Chart' || selected === 'Pie Chart') {
-    return xType === 'Qualitative' || yType === 'Qualitative'
-  }
-
+const canRenderChart = computed(() => {
+  if (!chartXKey.value) return false
+  if (!(activeDatasetData.value?.previewRows || []).length) return false
+  if (finalChartType.value === 'Scatter Plot') return !!chartYKey.value
   return true
 })
 
-const matchStatus = computed(() => {
-  if (!state.selectedX) return 'Select variables to evaluate chart fit'
-  if (isGoodMatch.value) return 'Current chart matches the selected variable types'
-  return `Current chart is not ideal. Try ${recommendedGraph.value}`
-})
-
-const chartTitle = computed(() => {
-  if (!state.selectedX) return 'Select variables'
-
-  if (recommendedGraph.value === 'Histogram') {
-    return `Histogram of ${state.selectedX}`
-  }
-
-  if (recommendedGraph.value === 'Pie Chart') {
-    return `Pie Chart of ${state.selectedX}`
-  }
-
-  if (!state.selectedY) {
-    return `${recommendedGraph.value} of ${state.selectedX}`
-  }
-
-  return `${state.selectedX} vs ${state.selectedY}`
-})
-
-const chartMessage = computed(() => {
-  if (!state.selectedX) {
-    return 'Choose variables from the sidebar to prepare a chart.'
-  }
-
-  if (isGoodMatch.value) {
-    return `The current setup is appropriate for a ${state.selectedGraphType}.`
-  }
-
-  return `The selected variables would be better represented with a ${recommendedGraph.value}.`
-})
-
 const autoInsight = computed(() => {
-  const xType = xMeta.value?.category
-  const yType = yMeta.value?.category
-
   if (!state.selectedX) {
     return 'Upload a dataset and select variables to generate chart guidance.'
   }
 
-  if (!state.selectedY) {
-    return `${state.selectedX} is currently treated as ${xType || 'Unknown'}, so ${recommendedGraph.value} is recommended.`
-  }
-
-  return `${state.selectedX} is ${xType || 'Unknown'} and ${state.selectedY} is ${yType || 'Unknown'}, so ${recommendedGraph.value} is the recommended chart.`
+  return `Current chart is prepared using ${chartXKey.value}${chartYKey.value ? ` and ${chartYKey.value}` : ''}.`
 })
 </script>

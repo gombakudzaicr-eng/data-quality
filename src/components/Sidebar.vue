@@ -133,7 +133,7 @@
     <div class="border-t border-white/10 px-3 py-3">
       <div class="grid gap-2">
        <button class="btn btn-primary" @click="handleCleanData">Clean Data</button>
-<button class="btn btn-secondary">Run EDA</button>
+<button class="btn btn-secondary" @click="handleRunEda">Run EDA</button>
 <button class="btn btn-danger" @click="handleReset">Reset</button>
       </div>
     </div>
@@ -143,6 +143,9 @@
 <script setup>
 import { useDashboardState } from '../composables/useDashboardState'
 import { uploadDataset } from '../services/uploadService'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const {
   state,
@@ -152,6 +155,7 @@ const {
   setDatasetFromUpload,
   cleanActiveDataset,
   resetDashboardState,
+  runEdaOnActiveDataset,
 } = useDashboardState()
 
 async function handleUpload(event, datasetKey) {
@@ -167,6 +171,7 @@ async function handleUpload(event, datasetKey) {
 
     state.activeDataset = datasetKey
     setDatasetFromUpload(datasetKey, data)
+
     state.uploadStatus.success = `${data.filename} uploaded successfully`
   } catch (err) {
     console.error('UPLOAD ERROR:', err)
@@ -183,5 +188,10 @@ function handleCleanData() {
 
 function handleReset() {
   resetDashboardState()
+}
+
+function handleRunEda() {
+  runEdaOnActiveDataset()
+  router.push('/eda-summary')
 }
 </script>
