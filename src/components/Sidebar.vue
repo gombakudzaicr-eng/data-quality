@@ -132,9 +132,9 @@
 
     <div class="border-t border-white/10 px-3 py-3">
       <div class="grid gap-2">
-        <button class="btn btn-primary">Clean Data</button>
-        <button class="btn btn-secondary">Run EDA</button>
-        <button class="btn btn-danger">Reset</button>
+       <button class="btn btn-primary" @click="handleCleanData">Clean Data</button>
+<button class="btn btn-secondary">Run EDA</button>
+<button class="btn btn-danger" @click="handleReset">Reset</button>
       </div>
     </div>
   </aside>
@@ -150,6 +150,8 @@ const {
   activeDatasetData,
   activeColumns,
   setDatasetFromUpload,
+  cleanActiveDataset,
+  resetDashboardState,
 } = useDashboardState()
 
 async function handleUpload(event, datasetKey) {
@@ -173,5 +175,13 @@ async function handleUpload(event, datasetKey) {
   } finally {
     state.uploadStatus.loading = false
   }
+}
+
+function handleCleanData() {
+  cleanActiveDataset()
+}
+
+function handleReset() {
+  resetDashboardState()
 }
 </script>

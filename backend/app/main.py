@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from app.routes import quality
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import upload
+from app.routes import upload, eda
 
 app = FastAPI(
     title="Dura Capital Data Quality API",
@@ -18,7 +18,7 @@ app.add_middleware(
 
 app.include_router(upload.router, prefix="/api/upload", tags=["Upload"])
 app.include_router(quality.router, prefix="/api/quality", tags=["Quality"])
-
+app.include_router(eda.router, prefix="/api/eda", tags=["EDA"])
 
 @app.get("/")
 def root():
